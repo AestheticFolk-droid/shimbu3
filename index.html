@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Will You Be My Valentine?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+  /* ============================================
+     CUSTOMIZE ME — edit these and the CONFIG
+     object at the bottom of the file
+     ============================================ */
+  :root{
+    --pink-deep:#d81b60;
+    --pink-mid:#ff5ca8;
+    --pink-soft:#ffb3d1;
+    --pink-pale:#ffe3ef;
+    --cream:#fff6fa;
+    --ink:#7a0e3d;
+    --shadow:#a10d47;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'VT323', monospace;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,.5), transparent 40%),
+      linear-gradient(180deg, var(--pink-pale) 0%, var(--pink-soft) 45%, var(--pink-mid) 100%);
+    overflow:hidden;
+    position:relative;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001s !important; transition-duration:.001s !important; }
+  }
+
+  /* ---------- pixel scenery ---------- */
+  .scene{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+  .hills{
+    position:absolute; left:0; right:0; bottom:0; height:22%;
+    background:var(--pink-mid);
+    clip-path: polygon(
+      0% 100%, 0% 55%, 8% 55%, 8% 40%, 20% 40%, 20% 55%, 34% 55%, 34% 30%,
+      46% 30%, 46% 50%, 60% 50%, 60% 35%, 74% 35%, 74% 55%, 88% 55%, 88% 42%,
+      100% 42%, 100% 100%
+    );
+    opacity:.9;
+  }
+  .hills.back{ bottom:0; height:16%; background:var(--pink-deep); opacity:.45; }
+
+  .cloud{
+    position:absolute; background:#fff; opacity:.85;
+    box-shadow: 0 0 0 4px #fff;
+    image-rendering:pixelated;
+    clip-path: polygon(
+      10% 40%, 30% 40%, 30% 15%, 65% 15%, 65% 40%, 90% 40%, 90% 65%, 10% 65%
+    );
+  }
+
+  .heart-pixel{
+    position:absolute;
+    width:14px; height:14px;
+    background:var(--pink-deep);
+    opacity:.55;
+    clip-path: polygon(
+      20% 0%, 40% 0%, 50% 15%, 60% 0%, 80% 0%, 100% 20%, 100% 45%,
+      50% 100%, 0% 45%, 0% 20%
+    );
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp{
+    from{ transform:translateY(0) rotate(0deg); opacity:.6; }
+    to{ transform:translateY(-110vh) rotate(20deg); opacity:0; }
+  }
+
+  /* ---------- pixel panel / dialogue box ---------- */
+  .pixel-panel{
+    background:var(--cream);
+    border:4px solid var(--pink-deep);
+    box-shadow:
+      0 0 0 4px var(--cream),
+      0 0 0 8px var(--pink-deep),
+      8px 8px 0 8px rgba(161,13,71,.25);
+    clip-path: polygon(
+      0 12px, 12px 12px, 12px 0,
+      calc(100% - 12px) 0, calc(100% - 12px) 12px, 100% 12px,
+      100% calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), calc(100% - 12px) 100%,
+      12px 100%, 12px calc(100% - 12px), 0 calc(100% - 12px)
+    );
+    padding:2.2rem 1.6rem;
+  }
+
+  .app{
+    position:relative; z-index:1;
+    width:min(92vw, 420px);
+    text-align:center;
+  }
+
+  .icon-frame{
+    width:120px; height:120px;
+    margin:0 auto 1.2rem;
+    background:#1a1a1a;
+    border:4px solid var(--pink-deep);
+    box-shadow: 0 0 0 4px var(--cream), 0 0 0 8px var(--pink-deep);
+    clip-path: polygon(
+      0 10px, 10px 10px, 10px 0,
+      calc(100% - 10px) 0, calc(100% - 10px) 10px, 100% 10px,
+      100% calc(100% - 10px), calc(100% - 10px) calc(100% - 10px), calc(100% - 10px) 100%,
+      10px 100%, 10px calc(100% - 10px), 0 calc(100% - 10px)
+    );
+    display:flex; align-items:center; justify-content:center;
+    font-size:56px;
+    line-height:1;
+    position:relative;
+  }
+  .icon-frame span{ filter:drop-shadow(0 0 6px rgba(255,255,255,.25)); }
+
+  h1.title{
+    font-family:'Press Start 2P', monospace;
+    color:var(--pink-deep);
+    font-size:clamp(1.1rem, 5.2vw, 1.6rem);
+    line-height:1.6;
+    margin:.4rem 0 1rem;
+    text-shadow: 2px 2px 0 #fff;
+  }
+
+  h1.title.long{
+    font-size:clamp(.85rem, 4.4vw, 1.15rem);
+    line-height:1.7;
+  }
+
+  p.sub{
+    color:var(--ink);
+    font-size:1.35rem;
+    margin:.2rem 0 1.4rem;
+    line-height:1.3;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:'Press Start 2P', monospace;
+    font-size:.85rem;
+    letter-spacing:.5px;
+    padding:.95rem 1.4rem;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    background:var(--pink-deep);
+    box-shadow:
+      0 0 0 4px var(--cream),
+      0 0 0 8px var(--pink-deep),
+      0 6px 0 8px var(--shadow);
+    clip-path: polygon(
+      0 8px, 8px 8px, 8px 0,
+      calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+      100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+      8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+    );
+    transition: transform .08s ease;
+  }
+  .btn:active{ transform:translateY(4px); }
+  .btn:focus-visible{ outline:3px solid #ffe066; outline-offset:4px; }
+
+  .btn.primary{ background:var(--pink-deep); }
+  .btn.ghost{
+    background:var(--pink-pale);
+    color:var(--pink-deep);
+    box-shadow:
+      0 0 0 4px var(--cream),
+      0 0 0 8px var(--pink-soft),
+      0 6px 0 8px #d98fb3;
+    font-size:.75rem;
+    padding:.7rem 1.1rem;
+  }
+  .btn.ghost:active{ transform:none; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .btn-row{ display:flex; gap:1.1rem; align-items:center; justify-content:center; margin-top:.5rem; flex-wrap:wrap; }
+
+  #noBtn{ position:relative; }
+
+  .tiny{
+    display:block; margin-top:1rem;
+    font-size:.95rem; color:var(--ink); opacity:.6;
+  }
+
+  /* ---------- date screen ---------- */
+  .field-label{
+    font-family:'Press Start 2P', monospace;
+    font-size:.7rem; color:var(--pink-deep);
+    margin-bottom:.6rem;
+  }
+  input[type="date"]{
+    font-family:'VT323', monospace;
+    font-size:1.3rem;
+    width:100%;
+    padding:.65rem .8rem;
+    border:3px solid var(--pink-deep);
+    background:#fff;
+    color:var(--ink);
+    margin-bottom:1.3rem;
+    clip-path: polygon(
+      0 8px, 8px 8px, 8px 0,
+      calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+      100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+      8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+    );
+  }
+
+  input[type="email"]{
+    font-family:'VT323', monospace;
+    font-size:1.3rem;
+    width:100%;
+    padding:.65rem .8rem;
+    border:3px solid var(--pink-deep);
+    background:#fff;
+    color:var(--ink);
+    margin-bottom:1.3rem;
+    clip-path: polygon(
+      0 8px, 8px 8px, 8px 0,
+      calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+      100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+      8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+    );
+  }
+
+  .activity-pick{ display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; margin-bottom:1.4rem; }
+  .chip{
+    font-family:'VT323', monospace;
+    font-size:1.05rem;
+    padding:.4rem .9rem;
+    background:#fff;
+    border:2px solid var(--pink-soft);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .chip.selected{ background:var(--pink-deep); color:#fff; border-color:var(--pink-deep); }
+
+  /* ---------- screens ---------- */
+  .screen{ display:none; animation: pop .35s ease; }
+  .screen.active{ display:block; }
+  @keyframes pop{
+    from{ opacity:0; transform:scale(.92) translateY(10px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  .badge{
+    position:absolute; top:-14px; right:-10px;
+    background:#fff; color:var(--pink-deep);
+    font-family:'Press Start 2P', monospace;
+    font-size:.55rem;
+    padding:.4rem .5rem;
+    border:2px solid var(--pink-deep);
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+
+  #confirmDate, #confirmActivity{ color:var(--pink-deep); }
+
+  footer.credit{
+    margin-top:1.2rem; font-size:.85rem; color:var(--ink); opacity:.55;
+  }
+
+  #sendStatus{
+    font-size:1.05rem;
+    color:var(--ink);
+    margin-top:.8rem;
+    min-height:1.4rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene"></div>
+
+<main class="app">
+
+  <!-- SCREEN 1: the ask -->
+  <section class="screen active" id="screen-ask">
+    <div class="icon-frame"><span>🐱</span></div>
+    <h1 class="title long" id="askTitle">shottee...can bimbooss be shamil's valentine for life??</h1>
+    <div class="btn-row">
+      <button class="btn primary" id="yesBtn">YES ✦</button>
+      <button class="btn ghost" id="noBtn">No</button>
+    </div>
+    <span class="tiny" id="noHint">don't do this</span>
+  </section>
+
+  <!-- SCREEN 2: yay -->
+  <section class="screen" id="screen-yay">
+    <div class="icon-frame"><span>💕</span></div>
+    <h1 class="title">YAY!</h1>
+    <p class="sub" id="yayMessage">I'm so glad u said yes.</p>
+    <div class="btn-row">
+      <button class="btn primary" id="toDateBtn">Press to continue →</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: pick a date -->
+  <section class="screen" id="screen-date">
+    <div class="icon-frame"><span>😽</span></div>
+    <h1 class="title">Pick a date</h1>
+    <p class="sub">Choose the day for our cute little plan.</p>
+    <div class="field-label">DD / MM / YYYY</div>
+    <input type="date" id="dateInput">
+    <div class="field-label">WHAT ARE WE DOING?</div>
+    <div class="activity-pick" id="activityPick"></div>
+    <div class="field-label">YOUR EMAIL (so I can send you the invite too 💌)</div>
+    <input type="email" id="emailInput" placeholder="you@example.com">
+    <div class="btn-row">
+      <button class="btn primary" id="confirmBtn" disabled>Continue →</button>
+    </div>
+    <div id="sendStatus"></div>
+  </section>
+
+  <!-- SCREEN 4: confirmation -->
+  <section class="screen" id="screen-confirm">
+    <div class="icon-frame" style="position:relative;">
+      <span>🐼</span>
+      <div class="badge">♥ 1 NEW MESSAGE</div>
+    </div>
+    <h1 class="title">DATE!</h1>
+    <p class="sub"><span id="confirmDate">—</span><br><span id="confirmActivity">—</span></p>
+    <p class="tiny" id="emailConfirmMsg" style="opacity:1;"></p>
+    <footer class="credit">see you then ♥</footer>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+/* ============================================
+   CONFIG — change these to personalize the site
+   ============================================ */
+const CONFIG = {
+  question: "shottee...can bimbooss be shamil's valentine for life??",
+  yayMessage: "I'm so glad u said yes.",
+  activities: ["Coffee & Walk", "Dinner", "Movie Night", "Picnic"],
+};
+
+/* ============================================
+   EMAILJS CONFIG — sends an invite to both people
+   when the date is confirmed
+   ============================================ */
+const EMAIL_CONFIG = {
+  serviceId: "service_ax9565i",
+  templateId: "template_kvzp4ws",
+  publicKey: "vHfuqeftwSoaAwPI2",
+  shamilEmail: "shazsha61@gmail.com", // Shamil's own email — always gets a copy
+};
+
+emailjs.init(EMAIL_CONFIG.publicKey);
+
+document.getElementById('askTitle').textContent = CONFIG.question;
+document.getElementById('yayMessage').textContent = CONFIG.yayMessage;
+
+// build activity chips
+const activityWrap = document.getElementById('activityPick');
+let selectedActivity = CONFIG.activities[0];
+CONFIG.activities.forEach((act, i) => {
+  const chip = document.createElement('div');
+  chip.className = 'chip' + (i === 0 ? ' selected' : '');
+  chip.textContent = act;
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedActivity = act;
+  });
+  activityWrap.appendChild(chip);
+});
+
+// ---------- screen navigation ----------
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ---------- the dodging "No" button ----------
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
+const noHint = document.getElementById('noHint');
+const isTouchDevice = matchMedia('(hover: none), (pointer: coarse)').matches;
+let dodges = 0;
+let dodgeCooldown = false;
+const hints = ["don't do this", "nuh uh", "try again", "not happening", "nope!", "keep trying though"];
+
+function dodge(){
+  if (dodgeCooldown) return; // guard against touchstart + synthetic click double-fire
+  dodgeCooldown = true;
+  setTimeout(() => { dodgeCooldown = false; }, 350);
+
+  dodges++;
+
+  // Pull it out of the flex flow so the layout doesn't jump, and
+  // position it relative to the viewport so it can never end up
+  // clipped outside a small mobile screen.
+  const margin = 16;
+  const btnRect = noBtn.getBoundingClientRect();
+  const w = btnRect.width || 100;
+  const h = btnRect.height || 48;
+  const maxX = Math.max(window.innerWidth - w - margin * 2, 40);
+  const maxY = Math.max(window.innerHeight - h - margin * 2, 40);
+  const x = margin + Math.random() * maxX;
+  const y = margin + Math.random() * maxY;
+
+  if (noBtn.style.position !== 'fixed'){
+    noBtn.style.position = 'fixed';
+    noBtn.style.zIndex = '20';
+    noBtn.style.margin = '0';
+  }
+  noBtn.style.left = x + 'px';
+  noBtn.style.top = y + 'px';
+
+  noHint.textContent = hints[Math.min(dodges, hints.length - 1)];
+  yesBtn.style.transform = `scale(${Math.min(1 + dodges * 0.06, 1.6)})`;
+}
+
+if (isTouchDevice){
+  // Touch devices: only listen for the tap itself, not hover,
+  // and don't also handle click (it would double-fire after touchstart).
+  noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodge(); }, {passive:false});
+} else {
+  noBtn.addEventListener('mouseenter', dodge);
+  noBtn.addEventListener('click', (e) => { e.preventDefault(); dodge(); });
+}
+
+window.addEventListener('resize', () => {
+  // if the keyboard opens/closes or the phone rotates, keep the
+  // dodged button from being stranded off-screen
+  if (noBtn.style.position === 'fixed'){
+    const r = noBtn.getBoundingClientRect();
+    const maxX = Math.max(window.innerWidth - r.width - 16, 0);
+    const maxY = Math.max(window.innerHeight - r.height - 16, 0);
+    noBtn.style.left = Math.min(parseFloat(noBtn.style.left) || 0, maxX) + 'px';
+    noBtn.style.top = Math.min(parseFloat(noBtn.style.top) || 0, maxY) + 'px';
+  }
+});
+
+yesBtn.addEventListener('click', () => showScreen('screen-yay'));
+
+document.getElementById('toDateBtn').addEventListener('click', () => showScreen('screen-date'));
+
+const dateInput = document.getElementById('dateInput');
+const emailInput = document.getElementById('emailInput');
+const confirmBtn = document.getElementById('confirmBtn');
+const sendStatus = document.getElementById('sendStatus');
+
+function isValidEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function updateConfirmState(){
+  confirmBtn.disabled = !dateInput.value || !isValidEmail(emailInput.value.trim());
+}
+dateInput.addEventListener('change', updateConfirmState);
+emailInput.addEventListener('input', updateConfirmState);
+
+confirmBtn.addEventListener('click', () => {
+  const d = new Date(dateInput.value + 'T00:00:00');
+  const formatted = d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  const herEmail = emailInput.value.trim();
+
+  document.getElementById('confirmDate').textContent = formatted;
+  document.getElementById('confirmActivity').textContent = selectedActivity;
+
+  confirmBtn.disabled = true;
+  sendStatus.textContent = "sending your invites... 💌";
+
+  const recipients = [EMAIL_CONFIG.shamilEmail, herEmail];
+
+  const sendPromises = recipients.map(to_email =>
+    emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, {
+      to_email: to_email,
+      date: formatted,
+      activity: selectedActivity,
+    })
+  );
+
+  Promise.all(sendPromises)
+    .then(() => {
+      sendStatus.textContent = "";
+      document.getElementById('emailConfirmMsg').textContent =
+        "invites sent to both of you ♥";
+      showScreen('screen-confirm');
+    })
+    .catch((err) => {
+      console.error('EmailJS error:', err);
+      sendStatus.textContent = "couldn't send the emails — but the date's still on! try again?";
+      confirmBtn.disabled = false;
+    });
+});
+
+// ---------- pixel scenery generation ----------
+const scene = document.getElementById('scene');
+
+const hillsBack = document.createElement('div');
+hillsBack.className = 'hills back';
+scene.appendChild(hillsBack);
+
+const hills = document.createElement('div');
+hills.className = 'hills';
+scene.appendChild(hills);
+
+// clouds
+for(let i=0;i<4;i++){
+  const c = document.createElement('div');
+  c.className = 'cloud';
+  const w = 60 + Math.random()*50;
+  c.style.width = w + 'px';
+  c.style.height = (w*0.5) + 'px';
+  c.style.top = (5 + Math.random()*35) + '%';
+  c.style.left = (Math.random()*90) + '%';
+  scene.appendChild(c);
+}
+
+// floating pixel hearts
+for(let i=0;i<14;i++){
+  const h = document.createElement('div');
+  h.className = 'heart-pixel';
+  h.style.left = Math.random()*100 + '%';
+  h.style.bottom = '-5%';
+  h.style.animationDuration = (6 + Math.random()*6) + 's';
+  h.style.animationDelay = (Math.random()*8) + 's';
+  const s = 8 + Math.random()*10;
+  h.style.width = s + 'px';
+  h.style.height = s + 'px';
+  scene.appendChild(h);
+}
+</script>
+
+</body>
+</html>
